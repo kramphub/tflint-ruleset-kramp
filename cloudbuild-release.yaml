@@ -1,0 +1,17 @@
+# Is triggered by a tag push (e.g. v1.0.0)
+availableSecrets:
+  secretManager:
+    - versionName: ${_GITHUB_TOKEN_SECRET_VERSION}
+      env: GITHUB_TOKEN
+steps:
+  - name: "goreleaser/goreleaser"
+    id: "release-binaries"
+    env:
+      - GORELEASER_CURRENT_TAG=${TAG_NAME}
+    secretEnv:
+      - GITHUB_TOKEN
+    script : |
+      git tag ${GORELEASER_CURRENT_TAG} # Because goreleaser needs the tag to be present and a shallow clone does not have it
+      goreleaser release
+options:
+  machineType: "E2_HIGHCPU_8"
