@@ -54,7 +54,10 @@ To do a 'dry-run' release (thus not actually releasing):
 goreleaser release --clean --skip=publish --skip=validate
 ```
 
-The actual release is done by this CloudBuild script: [cloudbuild-goreleaser.yaml](cloudbuild-goreleases.yaml).
+The actual release is done by this CloudBuild script: [cloudbuild-release.yaml](cloudbuild-release.yaml).
+
+Which responds on a tag that is created by: [cloudbuild-tag.yaml](cloudbuild-tag.yaml).
+If the commit message starts with, for example, `feat: ...` or `fix: ...` (see [semantic-release](https://github.com/semantic-release/semantic-release)).
 
 ## Development
 
