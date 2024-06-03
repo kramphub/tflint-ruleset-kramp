@@ -23,7 +23,7 @@ plugin "google" {
 
 plugin "kramp" {
   enabled = true
-  version = "1.1.0"
+  version = "1.0.0"
   source  = "github.com/kramphub/tflint-ruleset-kramp"
 }
 
