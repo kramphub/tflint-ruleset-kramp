@@ -1,0 +1,19 @@
+# Is triggered for a push to a branch other than main.
+substitutions:
+  # Keep the go version in sync with the version used by the tflint image (https://github.com/terraform-linters/tflint/blob/master/Dockerfile)
+  # Especially the alpine version is important to create compatible binaries.
+  _GO_VERSION: "1.22-alpine3.19"
+  _TFLINT_VERSION: "0.51.1"
+steps:
+  - name: "golang:${_GO_VERSION}"
+    id: "build-and-test"
+    script: go mod tidy && go build && go test -v ./...
+    env:
+      - GOOS=linux
+      - GOARCH=amd64
+  - name: "ghcr.io/terraform-linters/tflint:v${_TFLINT_VERSION}"
+    id: "verify"
+    dir: "manual_tests"
+    env:
+      - TFLINT_LOG=debug
+    script: ./run_in_cloudbuild.sh
