@@ -10,7 +10,7 @@ func main() {
 	plugin.Serve(&plugin.ServeOpts{
 		RuleSet: &tflint.BuiltinRuleSet{
 			Name:    "kramp",
-			Version: "1.0.0",
+			Version: "0.0.0-semantically-released",
 			Rules: []tflint.Rule{
 				rules.NewAuthoritativeIAMPolicyOnFolderLevelRule(),
 				rules.NewAuthoritativeIAMPolicyOnProjectLevelRule(),
