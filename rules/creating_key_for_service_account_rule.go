@@ -25,7 +25,7 @@ func (rule *CreatingKeyForServiceAccountRule) Severity() tflint.Severity {
 }
 
 func (rule *CreatingKeyForServiceAccountRule) Link() string {
-	return TerraformGuidelinesConfluenceLink
+	return GetLinkForRule(rule.Name())
 }
 
 func (rule *CreatingKeyForServiceAccountRule) Check(runner tflint.Runner) error {

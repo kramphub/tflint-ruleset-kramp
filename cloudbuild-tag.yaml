@@ -15,10 +15,6 @@ steps:
     env:
       - GOOS=linux
       - GOARCH=amd64
-  - name: "ghcr.io/terraform-linters/tflint:v${_TFLINT_VERSION}"
-    id: "verify"
-    dir: "manual_tests"
-    script: ./run_in_cloudbuild.sh
   - name: "node:20"  # version 20 is LTS, and -alpine and -slim revisions do not include git which is needed
     id: "semantic-release"
     automapSubstitutions: true

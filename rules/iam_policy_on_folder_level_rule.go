@@ -25,7 +25,7 @@ func (rule *IAMPolicyOnFolderLevelRule) Severity() tflint.Severity {
 }
 
 func (rule *IAMPolicyOnFolderLevelRule) Link() string {
-	return TerraformGuidelinesConfluenceLink
+	return GetLinkForRule(rule.Name())
 }
 
 func (rule *IAMPolicyOnFolderLevelRule) Check(runner tflint.Runner) error {

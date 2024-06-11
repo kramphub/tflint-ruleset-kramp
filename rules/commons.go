@@ -9,7 +9,7 @@ import (
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
 )
 
-const TerraformGuidelinesConfluenceLink = "https://kramphub.atlassian.net/wiki/spaces/CPT/pages/6634111461/Terraform+custom+checks"
+const terraformGuidelinesConfluenceLink = "https://kramphub.atlassian.net/wiki/spaces/CPT/pages/6634111461/Terraform+custom+checks"
 
 const DefaultMessageResourceNotAllowed = "The usage of this resource is not allowed (or strongly discouraged)."
 
@@ -73,4 +73,11 @@ func FindAndReportResourcesForPattern(runner tflint.Runner, rule tflint.Rule, in
 func createMessage(resourceName string, message string) string {
 	msg := fmt.Sprintf("`%s` resource found. %s", resourceName, message)
 	return msg
+}
+
+func GetLinkForRule(ruleName string) string {
+	if len(ruleName) == 0 {
+		return terraformGuidelinesConfluenceLink
+	}
+	return fmt.Sprintf("%s#%s", terraformGuidelinesConfluenceLink, ruleName)
 }

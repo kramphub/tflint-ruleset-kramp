@@ -30,7 +30,7 @@ func (rule *IAMPolicyOnProjectLevelRule) Severity() tflint.Severity {
 }
 
 func (rule *IAMPolicyOnProjectLevelRule) Link() string {
-	return TerraformGuidelinesConfluenceLink
+	return GetLinkForRule(rule.Name())
 }
 
 func (rule *IAMPolicyOnProjectLevelRule) Check(runner tflint.Runner) error {
