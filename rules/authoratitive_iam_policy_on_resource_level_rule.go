@@ -27,7 +27,7 @@ func (rule *AuthoritativeIAMPolicyOnResourceLevelRule) Severity() tflint.Severit
 }
 
 func (rule *AuthoritativeIAMPolicyOnResourceLevelRule) Link() string {
-	return TerraformGuidelinesConfluenceLink
+	return GetLinkForRule(rule.Name())
 }
 
 func (rule *AuthoritativeIAMPolicyOnResourceLevelRule) Check(runner tflint.Runner) error {
