@@ -4,6 +4,7 @@ substitutions:
   # Especially the alpine version is important to create compatible binaries.
   _GO_VERSION: "1.22-alpine3.19"
   _TFLINT_VERSION: "0.51.1"
+  _JQ_VERSION: "latest"
 steps:
   - name: "golang:${_GO_VERSION}"
     id: "build-and-test"
@@ -12,8 +13,24 @@ steps:
       - GOOS=linux
       - GOARCH=amd64
   - name: "ghcr.io/terraform-linters/tflint:v${_TFLINT_VERSION}"
-    id: "verify"
-    dir: "manual_tests"
+    id: "run-tflint-for-verify-dir"
+    dir: "manual_tests/verify"
     env:
       - TFLINT_LOG=debug
-    script: ./run_in_cloudbuild.sh
+    script: |
+      mkdir -p ~/.tflint.d/plugins/ && cp ../../tflint-ruleset-kramp ~/.tflint.d/plugins/ # Make the ruleset available
+      tflint --enable-plugin=kramp --no-color --format=json | tee tflint_output.json
+  - name: "ghcr.io/terraform-linters/tflint:v${_TFLINT_VERSION}"
+    id: "run-tflint-for-verify_ignores-dir"
+    dir: "manual_tests/verify_ignores"
+    script: |
+      mkdir -p ~/.tflint.d/plugins/ && cp ../../tflint-ruleset-kramp ~/.tflint.d/plugins/ # Make the ruleset available
+      tflint --enable-plugin=kramp --no-color --format=json | tee tflint_output.json
+  - name: "ghcr.io/jqlang/jq:${_JQ_VERSION}"
+    id: "validate-output-for-verify-dir"
+    dir: "manual_tests/verify"
+    args: [".issues | length == 7", "--exit-status", "tflint_output.json"]
+  - name: "ghcr.io/jqlang/jq:${_JQ_VERSION}"
+    id: "validate-output-for-verify_ignores-dir"
+    dir: "manual_tests/verify_ignores"
+    args: [".issues | length == 0", "--exit-status", "tflint_output.json"]

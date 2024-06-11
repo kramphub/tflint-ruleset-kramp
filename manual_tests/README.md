@@ -4,7 +4,7 @@ These can be useful to verify that the rules are working as expected when provid
 Please find the unit tests in the [rules](../rules) directory (ending with `_test.go`).
 
 **Good to know:** normally `tflint --init` will download the ruleset on the fly, from this repository.
-Which is different than what happens in [run_in_cloudbuild.sh](run_in_cloudbuild.sh), since it uses the binary that was build just before.
+Which is different than what happens in [cloudbuild-test.yaml](../cloudbuild-test.yaml), since it uses the binary that was build just before.
 
 ---
 
