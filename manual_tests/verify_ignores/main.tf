@@ -72,6 +72,13 @@ resource "google_project_iam_member" "run-service-agent-on-project-level" {
   member  = "serviceAccount:your-service@your-project-id.iam.gserviceaccount.com"
 }
 
+# This role is allowed by the rule
+resource "google_project_iam_member" "run-service-agent-on-project-level" {
+  project = "your-project-id"
+  role    = "roles/observability.metricsWriter"
+  member  = "serviceAccount:your-service@your-project-id.iam.gserviceaccount.com"
+}
+
 # --- authoritative_iam_policy_on_resource_level ---
 
 # tflint-ignore: authoritative_iam_policy_on_resource_level #tfsec:ignore:custom-custom-authoritative_iam_policy_on_resource_level

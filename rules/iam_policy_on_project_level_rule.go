@@ -36,14 +36,15 @@ func (rule *IAMPolicyOnProjectLevelRule) Link() string {
 func (rule *IAMPolicyOnProjectLevelRule) Check(runner tflint.Runner) error {
 	resourceName := "google_project_iam_member"
 	allowedRoles := []string{
-		"roles/cloudtrace.agent",        // https://cloud.google.com/iam/docs/understanding-roles#cloudtrace.agent
-		"roles/errorreporting.writer",   // https://cloud.google.com/iam/docs/understanding-roles#errorreporting.writer
-		"roles/logging.logWriter",       // https://cloud.google.com/iam/docs/understanding-roles#logging.logWriter
-		"roles/monitoring.metricWriter", // https://cloud.google.com/iam/docs/understanding-roles#monitoring.metricWriter
-		"roles/run.serviceAgent",        // https://cloud.google.com/iam/docs/understanding-roles#run.serviceAgent
-		"roles/cloudsql.client",         // https://cloud.google.com/iam/docs/understanding-roles#cloudsql.client
-		"roles/bigquery.jobUser",        // https://cloud.google.com/iam/docs/understanding-roles#bigquery.jobUser
-		"roles/datastore.user",          // https://cloud.google.com/iam/docs/understanding-roles#datastore.user
+		"roles/cloudtrace.agent",            // https://cloud.google.com/iam/docs/understanding-roles#cloudtrace.agent
+		"roles/errorreporting.writer",       // https://cloud.google.com/iam/docs/understanding-roles#errorreporting.writer
+		"roles/logging.logWriter",           // https://cloud.google.com/iam/docs/understanding-roles#logging.logWriter
+		"roles/monitoring.metricWriter",     // https://cloud.google.com/iam/docs/understanding-roles#monitoring.metricWriter
+		"roles/run.serviceAgent",            // https://cloud.google.com/iam/docs/understanding-roles#run.serviceAgent
+		"roles/cloudsql.client",             // https://cloud.google.com/iam/docs/understanding-roles#cloudsql.client
+		"roles/bigquery.jobUser",            // https://cloud.google.com/iam/docs/understanding-roles#bigquery.jobUser
+		"roles/datastore.user",              // https://cloud.google.com/iam/docs/understanding-roles#datastore.user
+		"roles/observability.metricsWriter", // https://github.com/kramphub/kramphub-gcp-iam-tf/pull/338
 	}
 
 	schema := &hclext.BodySchema{
