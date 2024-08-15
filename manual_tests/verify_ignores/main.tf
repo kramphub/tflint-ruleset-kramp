@@ -75,7 +75,7 @@ resource "google_project_iam_member" "run-service-agent-on-project-level" {
 # This role is allowed by the rule
 resource "google_project_iam_member" "custom-observability-role-on-project-level" {
   project = "your-project-id"
-  role    = "roles/observability.metricsWriter"
+  role    = "organizations/344471582607/roles/observability.metricsWriter"
   member  = "serviceAccount:your-service@your-project-id.iam.gserviceaccount.com"
 }
 
