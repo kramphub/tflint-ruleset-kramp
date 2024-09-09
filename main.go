@@ -18,6 +18,9 @@ func main() {
 				rules.NewIAMPolicyOnProjectLevelRule(),
 				rules.NewAuthoritativeIAMPolicyOnResourceLevelRule(),
 				rules.NewCreatingKeyForServiceAccountRule(),
+				rules.NewServiceAccountWithAdminRoleRule(),
+				rules.NewServiceAccountWithBasicRoleRule(),
+				rules.NewGroupWithBasicRoleRule(),
 			},
 		},
 	})

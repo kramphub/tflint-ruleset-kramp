@@ -8,49 +8,21 @@ Which is different than what happens in [cloudbuild-test.yaml](../cloudbuild-tes
 
 ---
 
-For example:
+A simple example of how to run the tests locally:
+
+_Prerequisites: `go`, `tflint` and `jq`._
 
 ```shell
-cd ..
-make test && make install
-cd manual_tests/verify
-TFLINT_LOG=debug tflint --enable-plugin=kramp
-cd ..
+(cd .. && make test && make install)
+TFLINT_LOG=debug tflint --enable-plugin=kramp --chdir ./verify
+tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues"
+tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length"
+tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length == 10"
 ```
 
 ```shell
-cd ..
-make test && make install
-cd manual_tests/verify_ignores
-TFLINT_LOG=debug tflint --enable-plugin=kramp --minimum-failure-severity=notice
-cd ..
-```
-
-Note that for the command below you need to build the plugin for the CPU architecture used by the Docker image.
-See second example to see how to do that.
-
-```shell
-PARENT_DIR=$(dirname "$(pwd)")
-docker run -it --rm \
-  --name "tflint-ruleset-kramp-gcp" \
-  --volume "${PARENT_DIR}/:/workspace/" \
-  --workdir="/workspace/manual_tests/" \
-  --env "USERID=$(id -u):$(id -g)" \
-  --entrypoint="./run_in_cloudbuild.sh" \
-  ghcr.io/terraform-linters/tflint:v0.51.1
-```
-
-This shows how to build a compatible binary for the `tflint` Docker image:
-
-```shell
-cd ..
-docker run -it --rm \
-  --name "tflint-ruleset-kramp" \
-  --volume "$(pwd):/workspace" \
-  --workdir="/workspace" \
-  --env "USERID=$(id -u):$(id -g)" \
-  --entrypoint=sh \
-  golang:1.22-alpine3.19 \
-  -c "go mod tidy && go build && go test -v ./..."
-cd manual_tests
+(cd .. && make test && make install)
+TFLINT_LOG=debug tflint --enable-plugin=kramp --minimum-failure-severity=notice --chdir ./verify_ignores
+tflint --enable-plugin=kramp --chdir ./verify_ignores --no-color --format=json | jq ".issues"
+tflint --enable-plugin=kramp --chdir ./verify_ignores --no-color --format=json | jq ".issues | length == 0"
 ```
