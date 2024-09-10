@@ -23,7 +23,7 @@ func (rule *GroupWithBasicRoleRule) Enabled() bool {
 }
 
 func (rule *GroupWithBasicRoleRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return tflint.ERROR
 }
 
 func (rule *GroupWithBasicRoleRule) Link() string {

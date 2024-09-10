@@ -23,7 +23,7 @@ func (rule *ServiceAccountWithAdminRoleRule) Enabled() bool {
 }
 
 func (rule *ServiceAccountWithAdminRoleRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return tflint.ERROR
 }
 
 func (rule *ServiceAccountWithAdminRoleRule) Link() string {
