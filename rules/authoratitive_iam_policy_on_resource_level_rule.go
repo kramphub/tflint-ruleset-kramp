@@ -23,7 +23,7 @@ func (rule *AuthoritativeIAMPolicyOnResourceLevelRule) Enabled() bool {
 }
 
 func (rule *AuthoritativeIAMPolicyOnResourceLevelRule) Severity() tflint.Severity {
-	return tflint.NOTICE
+	return tflint.WARNING
 }
 
 func (rule *AuthoritativeIAMPolicyOnResourceLevelRule) Link() string {

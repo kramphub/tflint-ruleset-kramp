@@ -29,7 +29,7 @@ steps:
   - name: "ghcr.io/jqlang/jq:${_JQ_VERSION}"
     id: "validate-output-for-verify-dir"
     dir: "manual_tests/verify"
-    args: [".issues | length == 7", "--exit-status", "tflint_output.json"]
+    args: [".issues | length == 10", "--exit-status", "tflint_output.json"]
   - name: "ghcr.io/jqlang/jq:${_JQ_VERSION}"
     id: "validate-output-for-verify_ignores-dir"
     dir: "manual_tests/verify_ignores"

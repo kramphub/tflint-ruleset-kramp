@@ -121,3 +121,33 @@ resource "google_service_account_key" "mykey" {
   service_account_id = google_service_account.myaccount.name
   public_key_type    = "TYPE_X509_PEM_FILE"
 }
+
+# --- service_account_with_admin_role ---
+
+# tflint-ignore: service_account_with_admin_role
+resource "google_pubsub_topic_iam_member" "topic_admin" {
+  project = "your-project-id"
+  topic   = "some-topic"
+  role    = "roles/pubsub.admin"
+  member  = "serviceAccount:your-service@your-project-id.iam.gserviceaccount.com"
+}
+
+# --- service_account_with_basic_role ---
+
+# Adding suffix '_dummy' to the resource name to avoid from being picked up already by the 'iam_policy_on_project_level' rule
+# tflint-ignore: service_account_with_basic_role
+resource "google_project_iam_member_dummy" "owner" {
+  project = "your-project-id"
+  role    = "roles/owner"
+  member  = "serviceAccount:your-service@your-project-id.iam.gserviceaccount.com"
+}
+
+# --- group_account_with_basic_role ---
+
+# Adding suffix '_dummy' to the resource name to avoid from being picked up already by the 'iam_policy_on_project_level' rule
+# tflint-ignore: group_account_with_basic_role
+resource "google_project_iam_member_dummy" "owner" {
+  project = "your-project-id"
+  role    = "roles/owner"
+  member  = "group:somegroup@example.com"
+}
