@@ -44,6 +44,7 @@ func (rule *IAMPolicyOnProjectLevelRule) Check(runner tflint.Runner) error {
 		"roles/cloudsql.client",                                        // https://cloud.google.com/iam/docs/understanding-roles#cloudsql.client
 		"roles/bigquery.jobUser",                                       // https://cloud.google.com/iam/docs/understanding-roles#bigquery.jobUser
 		"roles/datastore.user",                                         // https://cloud.google.com/iam/docs/understanding-roles#datastore.user
+		"roles/cloudprofiler.agent",                                    // https://cloud.google.com/iam/docs/understanding-roles#cloudprofiler.agent
 		"organizations/344471582607/roles/observability.metricsWriter", // https://github.com/kramphub/kramphub-gcp-iam-tf/pull/338
 	}
 
