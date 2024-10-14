@@ -146,3 +146,4 @@ It is possible, when you check on attribute level, to report as range the locati
 For 'range' you can thus use `attribute.Expr.Range()`. 
 But then an 'ignore' comment on block level is not respected (it should then be on attribute level).
 See [iam_policy_on_project_level_rule.go](rules/iam_policy_on_project_level_rule.go) for an example.
+
