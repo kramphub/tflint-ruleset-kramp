@@ -47,8 +47,8 @@ func (rule *IAMPolicyOnProjectLevelRule) Check(runner tflint.Runner) error {
 		"roles/cloudprofiler.agent",                                    // https://cloud.google.com/iam/docs/understanding-roles#cloudprofiler.agent
 		"roles/pubsub.viewer",                                          // https://cloud.google.com/iam/docs/understanding-roles#pubsub.viewer
 		"organizations/344471582607/roles/observability.metricsWriter", // https://github.com/kramphub/kramphub-gcp-iam-tf/pull/338
-	    "roles/apigee.environmentAdmin",                                // Needed for Apigee CICD pipeline SA to deploy API proxies
-        "roles/apigee.apiAdminV2",                                      // Needed for Apigee CICD pipeline SA to deploy API proxies
+		"roles/apigee.environmentAdmin",                                // Needed for Apigee CICD pipeline SA to deploy API proxies
+		"roles/apigee.apiAdminV2",                                      // Needed for Apigee CICD pipeline SA to deploy API proxies
 	}
 
 	schema := &hclext.BodySchema{
