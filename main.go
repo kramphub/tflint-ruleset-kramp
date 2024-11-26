@@ -21,6 +21,7 @@ func main() {
 				rules.NewServiceAccountWithAdminRoleRule(),
 				rules.NewServiceAccountWithBasicRoleRule(),
 				rules.NewGroupWithBasicRoleRule(),
+				rules.NewPubsubSubscriptionWithoutExplicitExpirationRule(),
 			},
 		},
 	})

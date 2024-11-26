@@ -17,7 +17,7 @@ _Prerequisites: `go`, `tflint` and `jq`._
 TFLINT_LOG=debug tflint --enable-plugin=kramp --chdir ./verify
 tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues"
 tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length"
-tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length == 10"
+tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length == 12"
 ```
 
 ```shell
