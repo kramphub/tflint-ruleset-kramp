@@ -1,3 +1,4 @@
 /.idea/
 /tflint-ruleset-kramp
 dist/
+.DS_Store
