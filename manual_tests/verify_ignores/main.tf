@@ -46,7 +46,7 @@ resource "google_folder" "department1" {
 resource "google_folder_iam_member" "admin" {
   folder = google_folder.department1.name
   role   = "roles/editor"
-  member = "user:alice@gmail.com"
+  member = "user:alice@example.com"
 }
 
 # --- iam_policy_on_project_level ---
@@ -198,4 +198,54 @@ resource "google_pubsub_subscription" "without_expiration_ttl" {
   }
 
   enable_message_ordering    = false
+}
+
+# --- granting_permission_to_non_organization_principal & granting_permission_to_user_principal ---
+
+# Adding an 'X' to some of the resource names to avoid that they're being picked up already by a different rule (like 'iam_policy_on_project_level' for example)
+# The rules targeted here will check on attribute level, not on resource type level, so adding an X doesn't affect the targeted rules.
+
+# tflint-ignore: granting_permission_to_non_organization_principal, granting_permission_to_user_principal
+resource "google_project_iam_Xmember" "project_iam_member_user" {
+  project = "your-project-id"
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "user:some-body@acme.com"
+}
+
+# tflint-ignore: granting_permission_to_non_organization_principal
+resource "google_project_iam_Xmember" "project_iam_member_group" {
+  project = "your-project-id"
+  role    = "roles/secretmanager.secretAccessor"
+  member  = "group:some-group@acme.com"
+}
+
+# tflint-ignore: granting_permission_to_non_organization_principal, granting_permission_to_user_principal
+resource "google_project_iam_Xbinding" "project_iam_members" {
+  project = "your-project-id"
+  role    = "roles/secretmanager.secretAccessor"
+  members = [
+    "user:some-body@acme.com",
+    "group:some-group@acme.com",
+    "user:some-body@example.com",
+    "group:some-group@example.com"
+  ]
+}
+
+# tflint-ignore: granting_permission_to_non_organization_principal, granting_permission_to_user_principal
+resource "google_bigquery_dataset_access" "bq_dataset_access_user_by_email" {
+  dataset_id    = "your-project-id:your-dataset-id"
+  role          = "OWNER"
+  user_by_email = "some-body@acme.com"
+}
+
+# tflint-ignore: granting_permission_to_non_organization_principal, granting_permission_to_user_principal
+resource "google_bigquery_dataset_iam_Xbinding" "bq_dataset_iam_binding_members" {
+  dataset_id = "your-project-id:your-dataset-id"
+  role       = "roles/bigquery.dataViewer"
+  members = [
+    "user:some-body@acme.com",
+    "group:some-group@acme.com",
+    "user:some-body@example.com",
+    "group:some-group@example.com"
+  ]
 }

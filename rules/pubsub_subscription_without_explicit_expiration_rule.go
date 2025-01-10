@@ -78,10 +78,7 @@ func (rule *PubsubSubscriptionWithoutExplicitExpirationRule) Check(runner tflint
 			}
 		}
 		if !foundTtl {
-			resourceId := ""
-			if len(resource.Labels) >= 2 {
-				resourceId = resource.Labels[1]
-			}
+			resourceId := GetResourceBlockName(resource)
 			err := runner.EmitIssue(rule, fmt.Sprintf("`%s` `%s` doesn't have an explicit `%s.%s`. Please be aware that the subscription will be deleted after 31 days of inactivity.", resourceName, resourceId, expirationPolicyBlockName, ttlAttributeName), resource.DefRange)
 			if err != nil {
 				return err
