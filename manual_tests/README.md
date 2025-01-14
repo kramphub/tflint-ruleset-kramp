@@ -13,16 +13,18 @@ A simple example of how to run the tests locally:
 _Prerequisites: `go`, `tflint` and `jq`._
 
 ```shell
-(cd .. && make test && make install)
-TFLINT_LOG=debug tflint --enable-plugin=kramp --chdir ./verify
-tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues"
-tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length"
-tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length == 12"
+if (cd .. && make test && make install); then
+  TFLINT_LOG=debug tflint --enable-plugin=kramp --chdir ./verify
+  tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues"
+  tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length"
+  tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length == 23"
+fi
 ```
 
 ```shell
-(cd .. && make test && make install)
-TFLINT_LOG=debug tflint --enable-plugin=kramp --minimum-failure-severity=notice --chdir ./verify_ignores
-tflint --enable-plugin=kramp --chdir ./verify_ignores --no-color --format=json | jq ".issues"
-tflint --enable-plugin=kramp --chdir ./verify_ignores --no-color --format=json | jq ".issues | length == 0"
+if (cd .. && make test && make install); then
+  TFLINT_LOG=debug tflint --enable-plugin=kramp --minimum-failure-severity=notice --chdir ./verify_ignores
+  tflint --enable-plugin=kramp --chdir ./verify_ignores --no-color --format=json | jq ".issues"
+  tflint --enable-plugin=kramp --chdir ./verify_ignores --no-color --format=json | jq ".issues | length == 0"
+fi
 ```

@@ -22,6 +22,8 @@ func main() {
 				rules.NewServiceAccountWithBasicRoleRule(),
 				rules.NewGroupWithBasicRoleRule(),
 				rules.NewPubsubSubscriptionWithoutExplicitExpirationRule(),
+				rules.NewGrantingPermissionToNonOrganizationPrincipalRule(),
+				rules.NewGrantingPermissionToUserPrincipalRule(),
 			},
 		},
 	})

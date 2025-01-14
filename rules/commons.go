@@ -2,8 +2,10 @@ package rules
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/terraform-linters/tflint-plugin-sdk/hclext"
 	"github.com/terraform-linters/tflint-plugin-sdk/logger"
 	"github.com/terraform-linters/tflint-plugin-sdk/tflint"
@@ -35,7 +37,7 @@ func FindAndReportResource(runner tflint.Runner, rule tflint.Rule, resourceName 
 	return nil
 }
 
-// Using two regexes to match and exclude resources because Go Regex doesn't support negative lookarounds (which would be a cleaner solution; only requiring one pattern)
+// FindAndReportResourcesForPattern Using two regexes to match and exclude resources because Go Regex doesn't support negative lookarounds (which would be a cleaner solution; only requiring one pattern)
 func FindAndReportResourcesForPattern(runner tflint.Runner, rule tflint.Rule, includedResourcesPattern regexp.Regexp, excludedResourcesPattern regexp.Regexp, message string) error {
 	body, err := runner.GetModuleContent(&hclext.BodySchema{
 		Blocks: []hclext.BlockSchema{
@@ -46,25 +48,25 @@ func FindAndReportResourcesForPattern(runner tflint.Runner, rule tflint.Rule, in
 		return err
 	}
 	for _, resource := range body.Blocks {
-		resourceName := resource.Labels[0]
+		resourceType := GetResourceBlockType(resource)
 
 		if &excludedResourcesPattern != nil {
 			logger.Debug(fmt.Sprintf("Exclusion pattern provided '%s'", excludedResourcesPattern.String()))
-			if excludedResourcesPattern.MatchString(resourceName) {
-				logger.Debug(fmt.Sprintf("Resource '%s' matches regex '%s'. It's excluded and will be skipped.", resourceName, excludedResourcesPattern.String()))
+			if excludedResourcesPattern.MatchString(resourceType) {
+				logger.Debug(fmt.Sprintf("Resource '%s' matches regex '%s'. It's excluded and will be skipped.", resourceType, excludedResourcesPattern.String()))
 				continue
 			} else {
-				logger.Debug(fmt.Sprintf("Resource '%s' doesn't match regex '%s'. Therefore it's not excluded and not be skipped.", resourceName, excludedResourcesPattern.String()))
+				logger.Debug(fmt.Sprintf("Resource '%s' doesn't match regex '%s'. Therefore it's not excluded and not be skipped.", resourceType, excludedResourcesPattern.String()))
 			}
 		}
 
-		if includedResourcesPattern.MatchString(resourceName) {
-			logger.Debug(fmt.Sprintf("Resource '%s' matches regex '%s'. Reporting problem.", resourceName, includedResourcesPattern.String()))
-			if err := runner.EmitIssue(rule, createMessage(resourceName, message), resource.DefRange); err != nil {
+		if includedResourcesPattern.MatchString(resourceType) {
+			logger.Debug(fmt.Sprintf("Resource '%s' matches regex '%s'. Reporting problem.", resourceType, includedResourcesPattern.String()))
+			if err := runner.EmitIssue(rule, createMessage(resourceType, message), resource.DefRange); err != nil {
 				return err
 			}
 		} else {
-			logger.Debug(fmt.Sprintf("Resource '%s' doesn't match regex '%s'. Not reporting problem.", resourceName, includedResourcesPattern.String()))
+			logger.Debug(fmt.Sprintf("Resource '%s' doesn't match regex '%s'. Not reporting problem.", resourceType, includedResourcesPattern.String()))
 		}
 	}
 	return nil
@@ -99,14 +101,14 @@ func FindAndReportResourcesWithAttributeHavingValue(runner tflint.Runner, rule t
 	}
 
 	for _, resource := range body.Blocks {
-		resourceName := resource.Labels[0]
+		resourceType := GetResourceBlockType(resource)
 
-		if !resourcesPattern.MatchString(resourceName) {
-			logger.Debug(fmt.Sprintf("Resource '%s' doesn't match regex '%s'. Not checking its attributes.", resourceName, resourcesPattern.String()))
+		if !resourcesPattern.MatchString(resourceType) {
+			logger.Debug(fmt.Sprintf("Resource '%s' doesn't match regex '%s'. Not checking its attributes.", resourceType, resourcesPattern.String()))
 			continue
 		}
 
-		logger.Debug(fmt.Sprintf("Resource '%s' matches regex '%s'. Checking its attributes: %v", resourceName, resourcesPattern.String(), resource.Body.Attributes))
+		logger.Debug(fmt.Sprintf("Resource '%s' matches regex '%s'. Checking its attributes: %v", resourceType, resourcesPattern.String(), resource.Body.Attributes))
 
 		matchingAttributes := 0
 
@@ -121,7 +123,7 @@ func FindAndReportResourcesWithAttributeHavingValue(runner tflint.Runner, rule t
 
 			err := runner.EvaluateExpr(attribute.Expr, func(attributeValue string) error {
 				if attributeValuePattern.MatchString(attributeValue) {
-					logger.Debug(fmt.Sprintf("Resource '%s' has attribute '%s' with value '%s' that matches regex '%s'", resourceName, attributeName, attributeValue, attributeValuePattern.String()))
+					logger.Debug(fmt.Sprintf("Resource '%s' has attribute '%s' with value '%s' that matches regex '%s'", resourceType, attributeName, attributeValue, attributeValuePattern.String()))
 					matchingAttributes++
 				}
 				return nil
@@ -133,12 +135,66 @@ func FindAndReportResourcesWithAttributeHavingValue(runner tflint.Runner, rule t
 		}
 
 		if matchingAttributes == len(attributeAndValuePatterns) {
-			if err := runner.EmitIssue(rule, fmt.Sprintf("Issue with `%s` resource. %s", resourceName, message), resource.DefRange); err != nil {
+			if err := runner.EmitIssue(rule, fmt.Sprintf("Issue with `%s` resource. %s", resourceType, message), resource.DefRange); err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func GetAttributesUsedForPermissionAssignment() []string {
+	return []string{"member", "members", "user_by_email", "group_by_email"}
+}
+
+func FindResourcesThatGrantPermissionToPrincipal(runner tflint.Runner) (*hclext.BodyContent, error) {
+	attrSchema := []hclext.AttributeSchema{}
+	for _, attr := range GetAttributesUsedForPermissionAssignment() {
+		attrSchema = append(attrSchema, hclext.AttributeSchema{Name: attr})
+	}
+	body, err := runner.GetModuleContent(&hclext.BodySchema{
+		Blocks: []hclext.BlockSchema{
+			{Type: "resource", LabelNames: []string{"type", "name"}, Body: &hclext.BodySchema{
+				Attributes: attrSchema,
+			}},
+		},
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+	return body, nil
+}
+
+// EvaluateAttributeStringValue evaluates the value of an attribute as a string, respecting the different types of expressions (like array / tuple)
+func EvaluateAttributeStringValue(attribute *hclext.Attribute, runner tflint.Runner, evaluateFn func(attributeValue string) error) error {
+	switch attribute.Expr.(type) {
+	case *hclsyntax.TemplateExpr:
+		templateExpr := attribute.Expr.(*hclsyntax.TemplateExpr)
+		return runner.EvaluateExpr(templateExpr, evaluateFn, nil)
+	case *hclsyntax.TupleConsExpr:
+		tupleExpr := attribute.Expr.(*hclsyntax.TupleConsExpr)
+		for _, exprInTuple := range tupleExpr.Exprs {
+			err := runner.EvaluateExpr(exprInTuple, evaluateFn, nil)
+			if err != nil {
+				return err
+			}
+		}
+	default:
+		logger.Warn(fmt.Sprintf("Unknown expression type '%s'", reflect.TypeOf(attribute.Expr)))
+	}
+	return nil
+}
+
+func GetAttributesForResource(resource *hclext.Block, attributeNames []string) []*hclext.Attribute {
+	var applicableAttributes []*hclext.Attribute
+	for _, attribute := range resource.Body.Attributes {
+		for _, attrName := range attributeNames {
+			if attribute.Name == attrName {
+				applicableAttributes = append(applicableAttributes, attribute)
+			}
+		}
+	}
+	return applicableAttributes
 }
 
 func createMessage(resourceName string, message string) string {
@@ -151,4 +207,18 @@ func GetLinkForRule(ruleName string) string {
 		return terraformGuidelinesConfluenceLink
 	}
 	return fmt.Sprintf("%s#%s", terraformGuidelinesConfluenceLink, ruleName)
+}
+
+func GetResourceBlockType(resource *hclext.Block) string {
+	if len(resource.Labels) < 1 {
+		return "?"
+	}
+	return resource.Labels[0]
+}
+
+func GetResourceBlockName(resource *hclext.Block) string {
+	if len(resource.Labels) < 2 {
+		return "?"
+	}
+	return resource.Labels[1]
 }
