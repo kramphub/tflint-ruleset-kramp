@@ -24,7 +24,7 @@ func (rule *GrantingPermissionToUserPrincipalRule) Enabled() bool {
 }
 
 func (rule *GrantingPermissionToUserPrincipalRule) Severity() tflint.Severity {
-	return tflint.WARNING
+	return tflint.ERROR
 }
 
 func (rule *GrantingPermissionToUserPrincipalRule) Link() string {

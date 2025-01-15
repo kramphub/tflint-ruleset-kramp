@@ -17,7 +17,7 @@ if (cd .. && make test && make install); then
   TFLINT_LOG=debug tflint --enable-plugin=kramp --chdir ./verify
   tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues"
   tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length"
-  tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length == 23"
+  tflint --enable-plugin=kramp --chdir ./verify --no-color --format=json | jq ".issues | length == 22"
 fi
 ```
 
